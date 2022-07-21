@@ -1,21 +1,22 @@
 import { createStore } from "redux";
 
+// COUNT
 const add = document.getElementById("add");
 const minus = document.getElementById("minus");
 const number = document.querySelector("span");
 
 number.innerText = 0;
 
-const REDUCER_TYPES = {
+const COUNT_REDUCER_TYPES = {
   ADD: "ADD",
   MINUS: "MINUS",
 };
 
 const countReducer = (count = 0, action) => {
   switch (action.type) {
-    case "ADD":
+    case COUNT_REDUCER_TYPES.ADD:
       return count + 1;
-    case "MINUS":
+    case COUNT_REDUCER_TYPES.MINUS:
       return count - 1;
     default:
       return count;
@@ -24,20 +25,65 @@ const countReducer = (count = 0, action) => {
 
 const countStore = createStore(countReducer);
 
-const onChange = () => {
+const onCountChange = () => {
   let value = countStore.getState();
   number.innerText = value;
 };
 
-countStore.subscribe(onChange);
+countStore.subscribe(onCountChange);
 
-const handleAdd = () => {
-  countStore.dispatch({ type: REDUCER_TYPES.ADD });
+const handleCountAdd = () => {
+  countStore.dispatch({ type: COUNT_REDUCER_TYPES.ADD });
 };
 
-const handleMinus = () => {
-  countStore.dispatch({ type: REDUCER_TYPES.MINUS });
+const handleCountMinus = () => {
+  countStore.dispatch({ type: COUNT_REDUCER_TYPES.MINUS });
 };
 
-add.addEventListener("click", handleAdd);
-minus.addEventListener("click", handleMinus);
+add.addEventListener("click", handleCountAdd);
+minus.addEventListener("click", handleCountMinus);
+
+// TODOS
+const form = document.querySelector("form");
+const input = document.querySelector("input");
+const ul = document.querySelector("ul");
+
+const TODOS_REDUCER_TYPES = {
+  ADD: "ADD",
+};
+
+const todosReducer = (state = [], action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case TODOS_REDUCER_TYPES.ADD:
+      return [payload, ...state];
+    default:
+      return state;
+  }
+};
+
+const todosStore = createStore(todosReducer);
+
+const paintTodos = () => {
+  const todos = todosStore.getState();
+
+  ul.innerHTML = "";
+
+  todos.forEach((todo) => {
+    const li = document.createElement("li");
+    li.innerText = todo;
+    ul.appendChild(li);
+  });
+};
+
+todosStore.subscribe(paintTodos);
+
+const onTodosSubmit = (event) => {
+  event.preventDefault();
+  const todo = input.value;
+  input.value = "";
+  todosStore.dispatch({ type: TODOS_REDUCER_TYPES.ADD, payload: todo });
+};
+
+form.addEventListener("submit", onTodosSubmit);
